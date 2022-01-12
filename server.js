@@ -32,9 +32,9 @@ app.post("/api/notes", (req, res) => {
     console.info(`Received \nTitle: ${title}\nText: ${text}`);
     let id = uuidv4();
     console.info(`Creating unique id: ${id}`);
-    appendToFile(title, text, id);
+    const newNote = appendToFile(title, text, id);
     console.info("Append complete!");
-    res.send("response");
+    res.send(newNote);
 });
 
 //Handles GET wildcard, responds with index.html
@@ -50,16 +50,16 @@ app.listen(PORT, () => {
 
 //Helper function to read from the db, append to it, and write it back
 function appendToFile(noteTitle, noteText, id) {
+    const obj = {
+        title: noteTitle,
+        text: noteText,
+        id: id
+    };
     fs.readFile("./db/db.json", (err, data) => {
         if (err) {
             console.err(`Error reading from ./db/db.json ${err}`);
         }
         const jsonData = JSON.parse(data);
-        const obj = {
-            title: noteTitle,
-            text: noteText,
-            id: id
-        };
         jsonData.push(obj);
         fs.writeFile("./db/db.json", JSON.stringify(jsonData), (err) => {
             if (err) {
@@ -67,4 +67,5 @@ function appendToFile(noteTitle, noteText, id) {
             }
         });
     });
+    return obj;
 }
