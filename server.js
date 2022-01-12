@@ -1,9 +1,10 @@
 //set up express, globals
 const express = require("express");
 const path = require("path");
-const db = require("./db/db.json");
+//const db = require("./db/db.json");
 const fs = require("fs");
 const {v4 : uuidv4} = require("uuid");
+const util = require("util");
 const { json } = require("express/lib/response");
 const PORT = 3001;
 const app = express();
@@ -12,6 +13,9 @@ const app = express();
 app.use(express.urlencoded({extended: true}));
 app.use(express.json());
 app.use(express.static("public"));
+
+//Read file promise
+const readFromFile = util.promisify(fs.readFile);
 
 //Handles GET /notes route and responds with notes.html
 app.get("/notes", (req, res) => {
@@ -22,7 +26,8 @@ app.get("/notes", (req, res) => {
 //Handles GET /api/notes route and responds with db.json file
 app.get("/api/notes", (req, res) => {
     console.info(`${req.method} request received, responding with db.json`);
-    res.json(db);
+    //res.json(db);
+    readFromFile("./db/db.json").then((data) => res.json(JSON.parse(data)));
 });
 
 //Handles POST /api/notes route, saves the request into the database and responds with the new database item
