@@ -24,7 +24,9 @@ app.get("/api/notes", (req, res) => {
 
 app.post("/api/notes", (req, res) => {
     console.info(`${req.method} request received, updating db.json`);
-    
+    const {noteTitle, noteText} = req.body;
+    console.info(`Received \nTitle: ${noteTitle}\nNoteText: ${noteText}`);
+    res.send("response");
 });
 
 app.get("*", (req, res) => {
