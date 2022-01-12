@@ -1,11 +1,12 @@
 //set up express, globals
 const express = require("express");
 const path = require("path");
-//const db = require("./db/db.json");
+//const db = require("./db/db.json"); Using this method won't allow the db to update in real time, you would have to restart the server after
+//every update
 const fs = require("fs");
 const {v4 : uuidv4} = require("uuid");
 const util = require("util");
-const { json } = require("express/lib/response");
+//const { json } = require("express/lib/response");
 const PORT = 3001;
 const app = express();
 
@@ -40,6 +41,27 @@ app.post("/api/notes", (req, res) => {
     const newNote = appendToFile(title, text, id);
     console.info("Append complete!");
     res.send(newNote);
+});
+
+//Handles DELETE request, reads from the db, finds the corresponding id, removes the obj, and writes back
+app.delete("/api/notes/:id", (req, res) => {
+    console.info(`${req.method} request received, deleting note with id: ${req.params.id}`);
+    fs.readFile("./db/db.json", (err, data) => {
+        if (err) {
+            console.err(`Error reading from ./db/db.json ${err}`);
+        }
+        let db = JSON.parse(data);
+        db = db.filter((i) => {
+            return i.id !== req.params.id;
+        });
+        fs.writeFile("./db/db.json", JSON.stringify(db), (err) => {
+            if (err) {
+                console.err(`Error writing to ./db/db.json ${err}`);
+            }
+        });
+        console.info("Write back after deletion completed!");
+    });
+    res.send("Delete completed");
 });
 
 //Handles GET wildcard, responds with index.html
