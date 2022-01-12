@@ -17,10 +17,13 @@ app.get("/notes", (req, res) => {
 });
 
 app.get("/api/notes", (req, res) => {
-    
+    console.info(`${req.method} request received, responding with db.json`);
+    let data = JSON.parse(fs.readFileSync("./db/db.json"));
+    res.send(data);
 });
 
 app.post("/api/notes", (req, res) => {
+    console.info(`${req.method} request received, updating db.json`);
     
 });
 
